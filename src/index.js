@@ -8,6 +8,11 @@ app.get('/', (request, reply) => {
   reply.send('Hello, World!');
 });
 
+app.get('/hello', (request, reply) => {
+  const { name } = request.query;
+  reply.send(`Hello, ${name || 'World'}!`);
+});
+
 app.get('/users', (request, reply) => {
   reply.send('GET /users');
 });
