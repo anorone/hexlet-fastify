@@ -1,0 +1,10 @@
+extends ../layouts/index
+
+block content
+  if users.length === 0
+    p No users
+  else
+    ul
+      each user in users
+        li
+          a(href=`/users/${user.id}`)= user.name

@@ -1,12 +1,19 @@
 import fastify from 'fastify';
+import viewPlugin from '@fastify/view';
+import pug from 'pug';
 import { state } from './state.js';
 
 const port = 3000;
 
 const app = fastify();
 
+app.register(viewPlugin, {
+  engine: { pug },
+  root: './src/views/'
+});
+
 app.get('/', (request, reply) => {
-  reply.send('Hello, World!');
+  reply.view('/index');
 });
 
 app.get('/hello', (request, reply) => {
@@ -29,7 +36,8 @@ app.get('/courses/:courseId/lessons/:lessonId', (request, reply) => {
 });
 
 app.get('/users', (request, reply) => {
-  reply.send('GET /users');
+  const locals = { users: state.users };
+  reply.view('/users/index', locals);
 });
 
 app.get('/users/:userId', (request, reply) => {
@@ -38,7 +46,8 @@ app.get('/users/:userId', (request, reply) => {
   if (!user) {
     reply.code(404).send({ message: 'User not found' });
   } else {
-    reply.send(user);
+    const locals = { user };
+    reply.view('/users/single', locals);
   }
 });
 
