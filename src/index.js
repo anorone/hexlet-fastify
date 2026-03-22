@@ -21,6 +21,19 @@ app.get('/hello', (request, reply) => {
   reply.send(`Hello, ${name || 'World'}!`);
 });
 
+app.get('/courses', (request, reply) => {
+  const { term } = request.query;
+  const { courses } = state;
+  const filteredCourses = term ? courses.filter(course => {
+    const title = course.title.toLowerCase();
+    const description = course.description.toLowerCase();
+    const searchTerm = term.toLowerCase();
+    return title.includes(searchTerm) || description.includes(searchTerm);
+  }) : courses;
+  const data = { term, courses: filteredCourses };
+  reply.view('courses/index', data);
+});
+
 app.get('/courses/new', (request, reply) => {
   reply.send('Course build');
 });
