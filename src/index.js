@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 import viewPlugin from '@fastify/view';
+import formBodyPlugin from '@fastify/formbody';
 import pug from 'pug';
 import { state } from './state.js';
 
@@ -11,6 +12,8 @@ app.register(viewPlugin, {
   engine: { pug },
   root: './src/views/'
 });
+
+app.register(formBodyPlugin);
 
 app.get('/', (request, reply) => {
   reply.view('/index');
@@ -35,7 +38,7 @@ app.get('/courses', (request, reply) => {
 });
 
 app.get('/courses/new', (request, reply) => {
-  reply.send('Course build');
+  reply.view('courses/new');
 });
 
 app.get('/courses/:courseId', (request, reply) => {
@@ -48,9 +51,23 @@ app.get('/courses/:courseId/lessons/:lessonId', (request, reply) => {
   reply.send(`Course ID: ${courseId}; Lesson ID: ${lessonId}`);
 });
 
+app.post('/courses', (request, reply) => {
+  const course = {
+    id: state.courses.length + 1,
+    title: request.body.title.trim(),
+    description: request.body.description.trim(),
+  };
+  state.courses.push(course);
+  reply.redirect('/courses');
+});
+
 app.get('/users', (request, reply) => {
   const locals = { users: state.users };
   reply.view('/users/index', locals);
+});
+
+app.get('/users/new', (request, reply) => {
+  reply.view('/users/new');
 });
 
 app.get('/users/:userId', (request, reply) => {
@@ -70,7 +87,14 @@ app.get('/users/:userId/posts/:postId', (request, reply) => {
 });
 
 app.post('/users', (request, reply) => {
-  reply.send('POST /users');
+  const user = {
+    id: state.users.length + 1,
+    name: request.body.name.trim(),
+    email: request.body.email.trim().toLowerCase(),
+    password: request.body.password,
+  };
+  state.users.push(user);
+  reply.redirect('/users');
 });
 
 app.listen({ port }, () => {

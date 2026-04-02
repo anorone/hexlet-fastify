@@ -1,6 +1,6 @@
 export const state = {
   users: [
-    { id: 1, name: 'user' },
+    { id: 1, name: 'user', email: 'user@yahoo.com', password: 'admin' },
   ],
   courses: [
     {

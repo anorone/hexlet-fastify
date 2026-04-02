@@ -1,6 +1,8 @@
 extends ../layouts/index
 
 block content
+  div
+    a(href='/users/new') Create user
   if users.length === 0
     p No users
   else
