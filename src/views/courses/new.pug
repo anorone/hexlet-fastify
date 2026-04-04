@@ -1,11 +1,20 @@
 extends ../layouts/index
 
 block content
+  if error
+    p= error.message
   form(action='/courses' method='post')
     div
       label Title:
-        input(type='text' name='title' required=true)
+        input(
+          type='text'
+          name='title'
+          value=values.title
+          required=true
+        )
     div
       label Description:
-        input(type='textl' name='description')
+        textarea(
+          name='description'
+        )= values.description
     input(type='submit' value='Add')
