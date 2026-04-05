@@ -1,4 +1,5 @@
 import fastify from 'fastify';
+import { plugin as reverseRoutesPlugin } from 'fastify-reverse-routes';
 import viewPlugin from '@fastify/view';
 import formBodyPlugin from '@fastify/formbody';
 import pug from 'pug';
@@ -7,25 +8,30 @@ import { state } from './state.js';
 
 const port = 3000;
 
-const app = fastify();
+const app = fastify({ exposeHeadRoutes: false });
+
+const route = (name, context) => app.reverse(name, context);
+
+await app.register(reverseRoutesPlugin);
 
 app.register(viewPlugin, {
   engine: { pug },
-  root: './src/views/'
+  root: './src/views/',
+  defaultContext: { route },
 });
 
 app.register(formBodyPlugin);
 
-app.get('/', (request, reply) => {
+app.get('/', { name: 'root' }, (request, reply) => {
   reply.view('/index');
 });
 
-app.get('/hello', (request, reply) => {
+app.get('/hello', { name: 'hello' }, (request, reply) => {
   const { name } = request.query;
   reply.send(`Hello, ${name || 'World'}!`);
 });
 
-app.get('/courses', (request, reply) => {
+app.get('/courses', { name: 'courses' }, (request, reply) => {
   const { term } = request.query;
   const { courses } = state;
   const filteredCourses = term ? courses.filter(course => {
@@ -38,22 +44,25 @@ app.get('/courses', (request, reply) => {
   reply.view('courses/index', data);
 });
 
-app.get('/courses/new', (request, reply) => {
+app.get('/courses/new', { name: 'newCourse' }, (request, reply) => {
   const locals = { values: {}, error: null };
   reply.view('courses/new', locals);
 });
 
-app.get('/courses/:courseId', (request, reply) => {
+app.get('/courses/:courseId', { name: 'course' }, (request, reply) => {
   const { courseId } = request.params;
   reply.send(`Course ID: ${courseId}`);
 });
 
-app.get('/courses/:courseId/lessons/:lessonId', (request, reply) => {
+app.get('/courses/:courseId/lessons/:lessonId', {
+  name: 'lesson',
+}, (request, reply) => {
   const { courseId, lessonId } = request.params;
   reply.send(`Course ID: ${courseId}; Lesson ID: ${lessonId}`);
 });
 
 app.post('/courses', {
+  name: 'addCourse',
   attachValidation: true,
   schema: {
     body: Yup.object().shape({
@@ -86,20 +95,20 @@ app.post('/courses', {
     description,
   };
   state.courses.push(course);
-  reply.redirect('/courses');
+  reply.redirect(route('courses'));
 });
 
-app.get('/users', (request, reply) => {
+app.get('/users', { name: 'users' }, (request, reply) => {
   const locals = { users: state.users };
   reply.view('/users/index', locals);
 });
 
-app.get('/users/new', (request, reply) => {
+app.get('/users/new', { name: 'newUser' }, (request, reply) => {
   const locals = { values: {}, error: null };
   reply.view('/users/new', locals);
 });
 
-app.get('/users/:userId', (request, reply) => {
+app.get('/users/:userId', { name: 'user' }, (request, reply) => {
   const { userId } = request.params;
   const user = state.users.find(user => user.id === parseInt(userId));
   if (!user) {
@@ -110,12 +119,15 @@ app.get('/users/:userId', (request, reply) => {
   }
 });
 
-app.get('/users/:userId/posts/:postId', (request, reply) => {
+app.get('/users/:userId/posts/:postId', {
+  name: 'post',
+}, (request, reply) => {
   const { userId, postId } = request.params;
   reply.send(`User ID: ${userId}; Post ID: ${postId}`);
 });
 
 app.post('/users', {
+  name: 'addUser',
   attachValidation: true,
   schema: {
     body: Yup.object().shape({
@@ -155,7 +167,7 @@ app.post('/users', {
     password,
   };
   state.users.push(user);
-  reply.redirect('/users');
+  reply.redirect(route('users'));
 });
 
 app.listen({ port }, () => {

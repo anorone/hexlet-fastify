@@ -3,7 +3,7 @@ extends ../layouts/index
 block content
   if error
     p= error.message
-  form(action='/users' method='post')
+  form(action=route('addUser') method='post')
     div
       label Name:
         input(

@@ -1,11 +1,11 @@
 extends ../layouts/index
 
 block content
-  form(action='/courses' method='get')
+  form(action=route('courses') method='get')
     input(type='search' name='term' value=term)
     input(type='submit' value='search')
   div
-    a(href='/courses/new') Add course
+    a(href=route('newCourse')) Add course
   if courses.length === 0
     p No courses
   else
