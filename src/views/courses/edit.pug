@@ -3,7 +3,7 @@ extends ../layouts/index
 block content
   if error
     p= error.message
-  form(action=route('createCourse') method='post')
+  form(action=route('updateCourse', { courseId: values.id }) method='post')
     div
       label Title:
         input(
@@ -17,4 +17,4 @@ block content
         textarea(
           name='description'
         )= values.description
-    input(type='submit' value='Add')
+    input(type='submit' value='Submit')

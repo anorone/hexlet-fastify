@@ -12,5 +12,6 @@ block content
     ul
       each course in courses
         li
-          h2= course.title
+          h2
+            a(href=route('course', { courseId: course.id }))= course.title
           p= course.description

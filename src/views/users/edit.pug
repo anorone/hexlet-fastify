@@ -1,0 +1,22 @@
+extends ../layouts/index
+
+block content
+  if error
+    p= error.message
+  form(action=route('updateUser', { userId: values.id }) method='post')
+    div
+      label Name:
+        input(
+          type='text'
+          name='name'
+          value=values.name
+        )
+    div
+      label Email:
+        input(
+          type='email'
+          name='email'
+          value=values.email
+          required=true
+        )
+    input(type='submit' value='Update')
