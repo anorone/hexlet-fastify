@@ -1,6 +1,7 @@
 import { plugin as reverseRoutesPlugin } from 'fastify-reverse-routes';
 import viewPlugin from '@fastify/view';
 import formBodyPlugin from '@fastify/formbody';
+import cookiePlugin from '@fastify/cookie';
 import pug from 'pug';
 import * as Yup from 'yup';
 import { state } from './state.js';
@@ -23,6 +24,7 @@ export default async (app) => {
   });
 
   app.register(formBodyPlugin);
+  app.register(cookiePlugin);
 
   addRootRoutes(app, state, { route });
   addUsersRoutes(app, state, { route });
