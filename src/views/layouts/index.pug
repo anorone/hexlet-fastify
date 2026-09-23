@@ -6,6 +6,10 @@ html(lang='en')
     header(style='display: flex')
       h1(style='margin: 0') Logo
       a(href=route('root')) Home
+      if username
+        span= username
+      else
+        a(href=route('login')) Enter
     main
       block content
     footer(style='display: flex')

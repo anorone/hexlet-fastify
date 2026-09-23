@@ -2,6 +2,7 @@ import { plugin as reverseRoutesPlugin } from 'fastify-reverse-routes';
 import viewPlugin from '@fastify/view';
 import formBodyPlugin from '@fastify/formbody';
 import cookiePlugin from '@fastify/cookie';
+import sessionPlugin from '@fastify/session';
 import pug from 'pug';
 import * as Yup from 'yup';
 import { state } from './state.js';
@@ -26,11 +27,22 @@ export default async (app) => {
   app.register(formBodyPlugin);
   app.register(cookiePlugin);
 
+  app.register(sessionPlugin, {
+    secret: process.env.SESSION_SECRET,
+    cookie: { secure: false },
+  });
+
   addRootRoutes(app, state, { route });
   addUsersRoutes(app, state, { route });
   addCoursesRoutes(app, state, { route });
   addLessonsRoutes(app, state, { route });
   addPostsRoutes(app, state, { route });
+
+  app.addHook('preHandler', (request, reply, done) => {
+    const { username } = request.session;
+    reply.locals = { username };
+    done();
+  });
 
   return app;
 };

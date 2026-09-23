@@ -1,0 +1,12 @@
+extends ./layouts/index
+
+block content
+  form(action=route('newLogin') method='post')
+    div
+      label Username:
+        input(
+          type='text'
+          name='username'
+          required=true
+        )
+    input(type='submit' value='Submit')
